@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { Search, Star, MoreVertical } from "lucide-react";
 import { candidatosIniciales, etapas } from "@/data/malinalli";
 
-export const Route = createFileRoute("/rh/candidatos")({
+export const Route = createFileRoute("/admin/candidatos")({
   head: () => ({
     meta: [
       { title: "Gestión de Candidatos — Malinalli ATS" },

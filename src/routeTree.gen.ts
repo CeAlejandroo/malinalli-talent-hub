@@ -10,69 +10,111 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as RhRouteImport } from './routes/rh'
-import { Route as RhIndexRouteImport } from './routes/rh.index'
-import { Route as RhCandidatosRouteImport } from './routes/rh.candidatos'
-import { Route as RhReportesRouteImport } from './routes/rh.reportes'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AdminCandidatosRouteImport } from './routes/admin.candidatos'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
+import { Route as AdminMensajesRouteImport } from './routes/admin.mensajes'
+import { Route as AdminReportesRouteImport } from './routes/admin.reportes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RhRoute = RhRouteImport.update({
-  id: '/rh',
-  path: '/rh',
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RhIndexRoute = RhIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => RhRoute,
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const RhCandidatosRoute = RhCandidatosRouteImport.update({
+const AdminCandidatosRoute = AdminCandidatosRouteImport.update({
   id: '/candidatos',
   path: '/candidatos',
-  getParentRoute: () => RhRoute,
+  getParentRoute: () => AdminRoute,
 } as any)
-const RhReportesRoute = RhReportesRouteImport.update({
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMensajesRoute = AdminMensajesRouteImport.update({
+  id: '/mensajes',
+  path: '/mensajes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportesRoute = AdminReportesRouteImport.update({
   id: '/reportes',
   path: '/reportes',
-  getParentRoute: () => RhRoute,
+  getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/rh': typeof RhRouteWithChildren
-  '/rh/candidatos': typeof RhCandidatosRoute
-  '/rh/reportes': typeof RhReportesRoute
-  '/rh/': typeof RhIndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
+  '/admin/candidatos': typeof AdminCandidatosRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/mensajes': typeof AdminMensajesRoute
+  '/admin/reportes': typeof AdminReportesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/rh/candidatos': typeof RhCandidatosRoute
-  '/rh/reportes': typeof RhReportesRoute
-  '/rh': typeof RhIndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
+  '/admin/candidatos': typeof AdminCandidatosRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/mensajes': typeof AdminMensajesRoute
+  '/admin/reportes': typeof AdminReportesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/rh': typeof RhRouteWithChildren
-  '/rh/candidatos': typeof RhCandidatosRoute
-  '/rh/reportes': typeof RhReportesRoute
-  '/rh/': typeof RhIndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/login': typeof LoginRoute
+  '/admin/candidatos': typeof AdminCandidatosRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/admin/mensajes': typeof AdminMensajesRoute
+  '/admin/reportes': typeof AdminReportesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rh' | '/rh/candidatos' | '/rh/reportes' | '/rh/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/admin/candidatos'
+    | '/admin/dashboard'
+    | '/admin/mensajes'
+    | '/admin/reportes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rh/candidatos' | '/rh/reportes' | '/rh'
-  id: '__root__' | '/' | '/rh' | '/rh/candidatos' | '/rh/reportes' | '/rh/'
+  to:
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/admin/candidatos'
+    | '/admin/dashboard'
+    | '/admin/mensajes'
+    | '/admin/reportes'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/login'
+    | '/admin/candidatos'
+    | '/admin/dashboard'
+    | '/admin/mensajes'
+    | '/admin/reportes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  RhRoute: typeof RhRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -84,54 +126,71 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rh': {
-      id: '/rh'
-      path: '/rh'
-      fullPath: '/rh'
-      preLoaderRoute: typeof RhRouteImport
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/rh/': {
-      id: '/rh/'
-      path: '/'
-      fullPath: '/rh/'
-      preLoaderRoute: typeof RhIndexRouteImport
-      parentRoute: typeof RhRoute
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/rh/candidatos': {
-      id: '/rh/candidatos'
+    '/admin/candidatos': {
+      id: '/admin/candidatos'
       path: '/candidatos'
-      fullPath: '/rh/candidatos'
-      preLoaderRoute: typeof RhCandidatosRouteImport
-      parentRoute: typeof RhRoute
+      fullPath: '/admin/candidatos'
+      preLoaderRoute: typeof AdminCandidatosRouteImport
+      parentRoute: typeof AdminRoute
     }
-    '/rh/reportes': {
-      id: '/rh/reportes'
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/mensajes': {
+      id: '/admin/mensajes'
+      path: '/mensajes'
+      fullPath: '/admin/mensajes'
+      preLoaderRoute: typeof AdminMensajesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reportes': {
+      id: '/admin/reportes'
       path: '/reportes'
-      fullPath: '/rh/reportes'
-      preLoaderRoute: typeof RhReportesRouteImport
-      parentRoute: typeof RhRoute
+      fullPath: '/admin/reportes'
+      preLoaderRoute: typeof AdminReportesRouteImport
+      parentRoute: typeof AdminRoute
     }
   }
 }
 
-interface RhRouteChildren {
-  RhCandidatosRoute: typeof RhCandidatosRoute
-  RhReportesRoute: typeof RhReportesRoute
-  RhIndexRoute: typeof RhIndexRoute
+interface AdminRouteChildren {
+  AdminCandidatosRoute: typeof AdminCandidatosRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminMensajesRoute: typeof AdminMensajesRoute
+  AdminReportesRoute: typeof AdminReportesRoute
 }
 
-const RhRouteChildren: RhRouteChildren = {
-  RhCandidatosRoute: RhCandidatosRoute,
-  RhReportesRoute: RhReportesRoute,
-  RhIndexRoute: RhIndexRoute,
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminCandidatosRoute: AdminCandidatosRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AdminMensajesRoute: AdminMensajesRoute,
+  AdminReportesRoute: AdminReportesRoute,
 }
 
-const RhRouteWithChildren = RhRoute._addFileChildren(RhRouteChildren)
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  RhRoute: RhRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

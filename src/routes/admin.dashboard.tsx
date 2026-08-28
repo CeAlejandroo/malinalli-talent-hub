@@ -9,7 +9,7 @@ import {
   type Etapa,
 } from "@/data/malinalli";
 
-export const Route = createFileRoute("/rh/")({
+export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({
     meta: [
       { title: "Panel de Control RH — Malinalli ATS" },
