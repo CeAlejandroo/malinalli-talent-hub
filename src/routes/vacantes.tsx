@@ -4,7 +4,7 @@ import { Bookmark, MapPin, Clock, Search, Briefcase } from "lucide-react";
 import { TopNav } from "@/components/TopNav";
 import { vacantes, areas, modalidades } from "@/data/malinalli";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/vacantes")({
   head: () => ({
     meta: [
       { title: "Malinalli — Portal de vacantes y talento de alto rendimiento" },
