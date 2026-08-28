@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { embudo } from "@/data/malinalli";
 
-export const Route = createFileRoute("/rh/reportes")({
+export const Route = createFileRoute("/admin/reportes")({
   head: () => ({
     meta: [
       { title: "Reportes y Analítica — Malinalli ATS" },
