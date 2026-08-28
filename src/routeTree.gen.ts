@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MisPostulacionesRouteImport } from './routes/mis-postulaciones'
+import { Route as VacantesRouteImport } from './routes/vacantes'
 import { Route as AdminCandidatosRouteImport } from './routes/admin.candidatos'
 import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 import { Route as AdminMensajesRouteImport } from './routes/admin.mensajes'
@@ -30,6 +32,16 @@ const AdminRoute = AdminRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MisPostulacionesRoute = MisPostulacionesRouteImport.update({
+  id: '/mis-postulaciones',
+  path: '/mis-postulaciones',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VacantesRoute = VacantesRouteImport.update({
+  id: '/vacantes',
+  path: '/vacantes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminCandidatosRoute = AdminCandidatosRouteImport.update({
@@ -57,6 +69,8 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/mis-postulaciones': typeof MisPostulacionesRoute
+  '/vacantes': typeof VacantesRoute
   '/admin/candidatos': typeof AdminCandidatosRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/mensajes': typeof AdminMensajesRoute
@@ -66,6 +80,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/mis-postulaciones': typeof MisPostulacionesRoute
+  '/vacantes': typeof VacantesRoute
   '/admin/candidatos': typeof AdminCandidatosRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/mensajes': typeof AdminMensajesRoute
@@ -76,6 +92,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/mis-postulaciones': typeof MisPostulacionesRoute
+  '/vacantes': typeof VacantesRoute
   '/admin/candidatos': typeof AdminCandidatosRoute
   '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/mensajes': typeof AdminMensajesRoute
@@ -87,6 +105,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
+    | '/mis-postulaciones'
+    | '/vacantes'
     | '/admin/candidatos'
     | '/admin/dashboard'
     | '/admin/mensajes'
@@ -96,6 +116,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
+    | '/mis-postulaciones'
+    | '/vacantes'
     | '/admin/candidatos'
     | '/admin/dashboard'
     | '/admin/mensajes'
@@ -105,6 +127,8 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
+    | '/mis-postulaciones'
+    | '/vacantes'
     | '/admin/candidatos'
     | '/admin/dashboard'
     | '/admin/mensajes'
@@ -115,6 +139,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MisPostulacionesRoute: typeof MisPostulacionesRoute
+  VacantesRoute: typeof VacantesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,6 +164,20 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mis-postulaciones': {
+      id: '/mis-postulaciones'
+      path: '/mis-postulaciones'
+      fullPath: '/mis-postulaciones'
+      preLoaderRoute: typeof MisPostulacionesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vacantes': {
+      id: '/vacantes'
+      path: '/vacantes'
+      fullPath: '/vacantes'
+      preLoaderRoute: typeof VacantesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/candidatos': {
@@ -191,6 +231,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
+  MisPostulacionesRoute: MisPostulacionesRoute,
+  VacantesRoute: VacantesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
