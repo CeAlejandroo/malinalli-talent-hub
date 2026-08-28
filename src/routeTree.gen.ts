@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as RhRouteImport } from './routes/rh'
 import { Route as RhIndexRouteImport } from './routes/rh.index'
 import { Route as RhCandidatosRouteImport } from './routes/rh.candidatos'
+import { Route as RhReportesRouteImport } from './routes/rh.reportes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,16 +35,23 @@ const RhCandidatosRoute = RhCandidatosRouteImport.update({
   path: '/candidatos',
   getParentRoute: () => RhRoute,
 } as any)
+const RhReportesRoute = RhReportesRouteImport.update({
+  id: '/reportes',
+  path: '/reportes',
+  getParentRoute: () => RhRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/rh': typeof RhRouteWithChildren
   '/rh/candidatos': typeof RhCandidatosRoute
+  '/rh/reportes': typeof RhReportesRoute
   '/rh/': typeof RhIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/rh/candidatos': typeof RhCandidatosRoute
+  '/rh/reportes': typeof RhReportesRoute
   '/rh': typeof RhIndexRoute
 }
 export interface FileRoutesById {
@@ -51,14 +59,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/rh': typeof RhRouteWithChildren
   '/rh/candidatos': typeof RhCandidatosRoute
+  '/rh/reportes': typeof RhReportesRoute
   '/rh/': typeof RhIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rh' | '/rh/candidatos' | '/rh/'
+  fullPaths: '/' | '/rh' | '/rh/candidatos' | '/rh/reportes' | '/rh/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rh/candidatos' | '/rh'
-  id: '__root__' | '/' | '/rh' | '/rh/candidatos' | '/rh/'
+  to: '/' | '/rh/candidatos' | '/rh/reportes' | '/rh'
+  id: '__root__' | '/' | '/rh' | '/rh/candidatos' | '/rh/reportes' | '/rh/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,16 +105,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RhCandidatosRouteImport
       parentRoute: typeof RhRoute
     }
+    '/rh/reportes': {
+      id: '/rh/reportes'
+      path: '/reportes'
+      fullPath: '/rh/reportes'
+      preLoaderRoute: typeof RhReportesRouteImport
+      parentRoute: typeof RhRoute
+    }
   }
 }
 
 interface RhRouteChildren {
   RhCandidatosRoute: typeof RhCandidatosRoute
+  RhReportesRoute: typeof RhReportesRoute
   RhIndexRoute: typeof RhIndexRoute
 }
 
 const RhRouteChildren: RhRouteChildren = {
   RhCandidatosRoute: RhCandidatosRoute,
+  RhReportesRoute: RhReportesRoute,
   RhIndexRoute: RhIndexRoute,
 }
 
