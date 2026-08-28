@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RhRouteImport } from './routes/rh'
 import { Route as RhIndexRouteImport } from './routes/rh.index'
+import { Route as RhCandidatosRouteImport } from './routes/rh.candidatos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,28 +29,36 @@ const RhIndexRoute = RhIndexRouteImport.update({
   path: '/',
   getParentRoute: () => RhRoute,
 } as any)
+const RhCandidatosRoute = RhCandidatosRouteImport.update({
+  id: '/candidatos',
+  path: '/candidatos',
+  getParentRoute: () => RhRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/rh': typeof RhRouteWithChildren
+  '/rh/candidatos': typeof RhCandidatosRoute
   '/rh/': typeof RhIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/rh/candidatos': typeof RhCandidatosRoute
   '/rh': typeof RhIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/rh': typeof RhRouteWithChildren
+  '/rh/candidatos': typeof RhCandidatosRoute
   '/rh/': typeof RhIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/rh' | '/rh/'
+  fullPaths: '/' | '/rh' | '/rh/candidatos' | '/rh/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/rh'
-  id: '__root__' | '/' | '/rh' | '/rh/'
+  to: '/' | '/rh/candidatos' | '/rh'
+  id: '__root__' | '/' | '/rh' | '/rh/candidatos' | '/rh/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -80,14 +89,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RhIndexRouteImport
       parentRoute: typeof RhRoute
     }
+    '/rh/candidatos': {
+      id: '/rh/candidatos'
+      path: '/candidatos'
+      fullPath: '/rh/candidatos'
+      preLoaderRoute: typeof RhCandidatosRouteImport
+      parentRoute: typeof RhRoute
+    }
   }
 }
 
 interface RhRouteChildren {
+  RhCandidatosRoute: typeof RhCandidatosRoute
   RhIndexRoute: typeof RhIndexRoute
 }
 
 const RhRouteChildren: RhRouteChildren = {
+  RhCandidatosRoute: RhCandidatosRoute,
   RhIndexRoute: RhIndexRoute,
 }
 
