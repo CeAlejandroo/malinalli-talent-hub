@@ -10,33 +10,69 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RhRouteImport } from './routes/rh'
+import { Route as RhIndexRouteImport } from './routes/rh.index'
+import { Route as RhCandidatosRouteImport } from './routes/rh.candidatos'
+import { Route as RhReportesRouteImport } from './routes/rh.reportes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RhRoute = RhRouteImport.update({
+  id: '/rh',
+  path: '/rh',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RhIndexRoute = RhIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RhRoute,
+} as any)
+const RhCandidatosRoute = RhCandidatosRouteImport.update({
+  id: '/candidatos',
+  path: '/candidatos',
+  getParentRoute: () => RhRoute,
+} as any)
+const RhReportesRoute = RhReportesRouteImport.update({
+  id: '/reportes',
+  path: '/reportes',
+  getParentRoute: () => RhRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/rh': typeof RhRouteWithChildren
+  '/rh/candidatos': typeof RhCandidatosRoute
+  '/rh/reportes': typeof RhReportesRoute
+  '/rh/': typeof RhIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/rh/candidatos': typeof RhCandidatosRoute
+  '/rh/reportes': typeof RhReportesRoute
+  '/rh': typeof RhIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/rh': typeof RhRouteWithChildren
+  '/rh/candidatos': typeof RhCandidatosRoute
+  '/rh/reportes': typeof RhReportesRoute
+  '/rh/': typeof RhIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/rh' | '/rh/candidatos' | '/rh/reportes' | '/rh/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/rh/candidatos' | '/rh/reportes' | '/rh'
+  id: '__root__' | '/' | '/rh' | '/rh/candidatos' | '/rh/reportes' | '/rh/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  RhRoute: typeof RhRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +84,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rh': {
+      id: '/rh'
+      path: '/rh'
+      fullPath: '/rh'
+      preLoaderRoute: typeof RhRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rh/': {
+      id: '/rh/'
+      path: '/'
+      fullPath: '/rh/'
+      preLoaderRoute: typeof RhIndexRouteImport
+      parentRoute: typeof RhRoute
+    }
+    '/rh/candidatos': {
+      id: '/rh/candidatos'
+      path: '/candidatos'
+      fullPath: '/rh/candidatos'
+      preLoaderRoute: typeof RhCandidatosRouteImport
+      parentRoute: typeof RhRoute
+    }
+    '/rh/reportes': {
+      id: '/rh/reportes'
+      path: '/reportes'
+      fullPath: '/rh/reportes'
+      preLoaderRoute: typeof RhReportesRouteImport
+      parentRoute: typeof RhRoute
+    }
   }
 }
 
+interface RhRouteChildren {
+  RhCandidatosRoute: typeof RhCandidatosRoute
+  RhReportesRoute: typeof RhReportesRoute
+  RhIndexRoute: typeof RhIndexRoute
+}
+
+const RhRouteChildren: RhRouteChildren = {
+  RhCandidatosRoute: RhCandidatosRoute,
+  RhReportesRoute: RhReportesRoute,
+  RhIndexRoute: RhIndexRoute,
+}
+
+const RhRouteWithChildren = RhRoute._addFileChildren(RhRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  RhRoute: RhRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
