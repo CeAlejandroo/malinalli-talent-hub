@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Bell, LogIn, LogOut, Menu } from "lucide-react";
+import { Bell, LogIn, LogOut, Menu, UserCheck } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
 
 const enlacesRh = [
   { to: "/admin/dashboard", label: "Tablero Kanban" },
   { to: "/admin/candidatos", label: "Candidatos" },
+  { to: "/vacantes", label: "Portal Vacantes" },
   { to: "/admin/mensajes", label: "Mensajes" },
   { to: "/admin/reportes", label: "Reportes" },
 ] as const;
@@ -21,7 +22,9 @@ export function TopNav() {
   const navigate = useNavigate();
 
   const esRh = usuario?.rol === "rh";
-  const enlaces = esRh ? enlacesRh : usuario ? enlacesCandidato : [];
+  const enlaces = esRh ? enlacesRh : usuario ? enlacesCandidato : [
+    { to: "/vacantes", label: "Vacantes" },
+  ];
 
   const salir = () => {
     logout();
@@ -62,26 +65,51 @@ export function TopNav() {
           {esRh && (
             <button
               aria-label="Notificaciones"
-              className="ml-2 grid h-9 w-9 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
+              className="ml-1 grid h-8 w-8 place-items-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
             >
               <Bell className="h-4 w-4" />
             </button>
           )}
 
           {usuario ? (
-            <button
-              onClick={salir}
-              className="ml-2 flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              <LogOut className="h-4 w-4" /> Salir
-            </button>
+            <div className="ml-3 flex items-center gap-2 border-l border-border/80 pl-3">
+              {/* Badge del usuario activo basado estrictamente en el rol de la base de datos */}
+              <div
+                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
+                  esRh
+                    ? "border border-primary/50 bg-primary/10 text-primary"
+                    : "border border-[#F5B800]/50 bg-[#F5B800]/10 text-[#F5B800]"
+                }`}
+              >
+                <UserCheck className="h-3 w-3" />
+                <span className="max-w-[120px] truncate">{usuario.nombre}</span>
+                <span className="rounded bg-black/40 px-1 py-0.2 text-[9px] uppercase tracking-wider">
+                  {usuario.rol}
+                </span>
+              </div>
+
+              <button
+                onClick={salir}
+                className="flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:text-destructive"
+              >
+                <LogOut className="h-3.5 w-3.5" /> Salir
+              </button>
+            </div>
           ) : (
-            <Link
-              to="/login"
-              className="ml-2 flex items-center gap-2 rounded-md bg-primary px-3 py-1.5 text-sm font-bold text-primary-foreground"
-            >
-              <LogIn className="h-4 w-4" /> Iniciar sesión
-            </Link>
+            <div className="ml-2 flex items-center gap-2">
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              >
+                <LogIn className="h-3.5 w-3.5" /> Iniciar sesión
+              </Link>
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90"
+              >
+                Registrarse
+              </Link>
+            </div>
           )}
         </nav>
 

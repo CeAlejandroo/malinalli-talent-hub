@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, Star, MoreVertical } from "lucide-react";
-import { candidatosIniciales, etapas } from "@/data/malinalli";
+import { etapas, type Etapa } from "@/data/malinalli";
+import { useAtsStore } from "@/lib/atsStore";
 
 export const Route = createFileRoute("/admin/candidatos")({
   head: () => ({
@@ -25,17 +26,18 @@ export const Route = createFileRoute("/admin/candidatos")({
 });
 
 function Candidatos() {
+  const { candidatos, actualizarEtapaCandidato } = useAtsStore();
   const [q, setQ] = useState("");
   const [etapa, setEtapa] = useState<string>("Todas");
 
   const filtrados = useMemo(
     () =>
-      candidatosIniciales.filter(
+      candidatos.filter(
         (c) =>
           (etapa === "Todas" || c.etapa === etapa) &&
           (c.nombre + c.puesto + c.vacante).toLowerCase().includes(q.toLowerCase()),
       ),
-    [q, etapa],
+    [candidatos, q, etapa],
   );
 
   return (
@@ -102,9 +104,18 @@ function Candidatos() {
                   <p className="text-xs text-muted-foreground">{c.antiguedad}</p>
                 </td>
                 <td className="px-4 py-3">
-                  <span className="rounded-full border border-primary/50 px-2 py-0.5 text-xs text-primary">
-                    {c.etapa}
-                  </span>
+                  <select
+                    value={c.etapa}
+                    onChange={(e) => actualizarEtapaCandidato(c.id, e.target.value as Etapa)}
+                    aria-label={`Cambiar estado de ${c.nombre}`}
+                    className="cursor-pointer rounded-full border border-primary/50 bg-background px-2.5 py-1 text-xs font-semibold text-primary outline-none hover:bg-primary/10 focus:ring-1 focus:ring-primary"
+                  >
+                    {etapas.map((e) => (
+                      <option key={e} value={e} className="bg-background text-foreground">
+                        {e}
+                      </option>
+                    ))}
+                  </select>
                 </td>
                 <td className="px-4 py-3">
                   <span className="flex items-center gap-1 text-xs text-primary">
@@ -135,7 +146,7 @@ function Candidatos() {
       </div>
 
       <p className="mt-3 text-xs text-muted-foreground">
-        Mostrando {filtrados.length} de {candidatosIniciales.length} candidatos
+        Mostrando {filtrados.length} de {candidatos.length} candidatos
       </p>
     </main>
   );

@@ -1,0 +1,27 @@
+# Malinalli Talent Hub - Project Rules & Context
+
+## Project Overview
+- **Name:** Malinalli Talent Hub
+- **Purpose:** HR Applicant Tracking System (ATS) & Public Job Board for Malinalli.
+- **Stack:** React, TypeScript, Vite, Tailwind CSS, Supabase.
+
+## Brand Design System
+- **Primary Color:** `#1C0D0A` (Dark Brand Brown)
+- **Secondary Color:** `#2A1612` (Medium Brand Brown)
+- **Accent/CTA Color:** `#F5B800` (Malinalli Gold)
+- **Backgrounds:** Clean dark/neutral tones to complement brand colors.
+
+## Architecture & Coding Standards
+1. **Component Structure:**
+   - Keep components modular inside `src/components/`.
+   - Separate candidate public views (`/vacantes`, `/postular`) from internal HR Dashboard management views.
+2. **TypeScript:**
+   - Always define strict types or interfaces for data models (Candidates, Job Openings, Applications).
+   - Avoid using `any`.
+3. **Tailwind CSS:**
+   - Utility-first approach. Use responsive classes (`md:`, `lg:`).
+   ## Supabase Integration Rules
+- Use `@supabase/supabase-js` for database operations.
+- Always retrieve environment variables using `import.meta.env.VITE_SUPABASE_URL` and `import.meta.env.VITE_SUPABASE_ANON_KEY`.
+- Respect table schemas for `vacantes` and `postulantes` (defined with UUIDs and enums `estado_vacante` and `estado_postulante`).
+- Strictly type Supabase queries using TypeScript interfaces from `@/types/database`.

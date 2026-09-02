@@ -2,12 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Plus, Star, Clock, GripVertical } from "lucide-react";
 import {
-  candidatosIniciales,
   etapas,
   metricas,
-  type Candidato,
   type Etapa,
 } from "@/data/malinalli";
+import { ModalCrearVacante } from "@/components/ModalCrearVacante";
+import { useAtsStore } from "@/lib/atsStore";
 
 export const Route = createFileRoute("/admin/dashboard")({
   head: () => ({
@@ -38,24 +38,35 @@ const etiquetaClases: Record<string, string> = {
 };
 
 function PanelRh() {
-  const [candidatos, setCandidatos] = useState<Candidato[]>(candidatosIniciales);
+  const { candidatos, actualizarEtapaCandidato } = useAtsStore();
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const [sobre, setSobre] = useState<Etapa | null>(null);
+  const [modalVacanteAbierto, setModalVacanteAbierto] = useState(false);
 
-  const mover = (id: string, etapa: Etapa) =>
-    setCandidatos((cs) => cs.map((c) => (c.id === id ? { ...c, etapa } : c)));
+  const mover = (id: string, etapa: Etapa) => {
+    actualizarEtapaCandidato(id, etapa);
+  };
 
   return (
     <main className="mx-auto max-w-[1600px] px-4 py-6">
       <header className="mb-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:justify-between">
         <div className="min-w-0">
           <h1 className="truncate text-2xl font-bold text-primary sm:text-3xl">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Pipeline principal de reclutamiento</p>
+          <p className="text-sm text-muted-foreground">Pipeline principal de reclutamiento (RH)</p>
         </div>
-        <button className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90">
+        <button
+          type="button"
+          onClick={() => setModalVacanteAbierto(true)}
+          className="inline-flex shrink-0 items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-bold text-primary-foreground transition-opacity hover:opacity-90"
+        >
           <Plus className="h-4 w-4" /> Crear vacante
         </button>
       </header>
+
+      <ModalCrearVacante
+        open={modalVacanteAbierto}
+        onClose={() => setModalVacanteAbierto(false)}
+      />
 
       <section className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {metricas.map((m) => (
