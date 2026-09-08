@@ -140,17 +140,7 @@ export type Candidato = {
   etiqueta?: "Nuevo" | "Urgente" | "Sustituto" | "Top";
 };
 
-export const candidatosIniciales: Candidato[] = [
-  { id: "c1", nombre: "Ana Silva", puesto: "Senior Frontend Dev", vacante: "Senior Full Stack Developer", etapa: "Postulado", match: 92, antiguedad: "Hace 2 días", iniciales: "AS", etiqueta: "Nuevo" },
-  { id: "c2", nombre: "Miguel Aranda", puesto: "Backend Java", vacante: "Ingeniero Backend Java", etapa: "Postulado", match: 78, antiguedad: "Hace 3 días", iniciales: "MA" },
-  { id: "c3", nombre: "Lucía Morales", puesto: "Analista Financiero", vacante: "Analista Financiero", etapa: "Postulado", match: 71, antiguedad: "Hace 1 día", iniciales: "LM" },
-  { id: "c4", nombre: "Carlos Mendoza", puesto: "Product Manager", vacante: "Cloud Architecture Lead", etapa: "Filtro", match: 88, antiguedad: "Hace 6 días", iniciales: "CM", etiqueta: "Top" },
-  { id: "c5", nombre: "Valeria Torres", puesto: "Lead Frontend Engineer", vacante: "Senior Full Stack Developer", etapa: "Filtro", match: 95, antiguedad: "Hace 4 días", iniciales: "VT" },
-  { id: "c6", nombre: "Laura Mendoza", puesto: "Director of UX", vacante: "Diseñador UX/UI Senior", etapa: "Entrevista", match: 90, antiguedad: "Hoy, 14:00", iniciales: "LM", etiqueta: "Urgente" },
-  { id: "c7", nombre: "Elena Ríos", puesto: "Senior UX/UI Designer", vacante: "Diseñador UX/UI Senior", etapa: "Entrevista", match: 84, antiguedad: "Hace 1 día", iniciales: "ER" },
-  { id: "c8", nombre: "Andrea Medina", puesto: "Product Manager", vacante: "Director of Enterprise Sales", etapa: "Oferta", match: 81, antiguedad: "Hace 1 semana", iniciales: "AM", etiqueta: "Sustituto" },
-  { id: "c9", nombre: "Alejandro Silva", puesto: "Senior Frontend Developer", vacante: "Senior Full Stack Developer", etapa: "Contratado", match: 97, antiguedad: "Hace 2 semanas", iniciales: "AS" },
-];
+export const candidatosIniciales: Candidato[] = [];
 
 export const metricas = [
   { label: "Candidatos nuevos", valor: "124", detalle: "+12% vs semana pasada" },

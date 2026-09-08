@@ -6,6 +6,8 @@ import type { EstadoVacante, Vacante } from "@/types/database";
 import { useAuth } from "@/lib/auth";
 import { useAtsStore, VACANTES_DEFAULT } from "@/lib/atsStore";
 import { ModalCrearVacante } from "@/components/ModalCrearVacante";
+import { ModalEditarVacante } from "@/components/ModalEditarVacante";
+import { ModalConfirmacionEliminar } from "@/components/ModalConfirmacionEliminar"; // Confirmation modal for delete
 import { ModalPostularse } from "@/components/ModalPostularse";
 
 const MARRON = "#1C0D0A";
@@ -69,11 +71,15 @@ function TarjetaVacante({
   esRh,
   onPostularse,
   onAlternarEstado,
+  onEditar,
+  onEliminar,
 }: {
   vacante: Vacante;
   esRh: boolean;
   onPostularse: (vacante: Vacante) => void;
   onAlternarEstado: (vacante: Vacante) => void;
+  onEditar: (vacante: Vacante) => void;
+  onEliminar: (vacanteId: string) => void;
 }) {
   return (
     <article
@@ -89,14 +95,31 @@ function TarjetaVacante({
         </span>
 
         {esRh && (
-          <button
-            type="button"
-            onClick={() => onAlternarEstado(vacante)}
-            className="text-[11px] font-medium text-[#F5B800]/80 transition-colors hover:text-[#F5B800] hover:underline"
-          >
-            {vacante.estado === "abierta" ? "Cerrar vacante" : "Reabrir vacante"}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => onAlternarEstado(vacante)}
+              className="text-[11px] font-medium text-[#F5B800]/80 transition-colors hover:text-[#F5B800] hover:underline"
+            >
+              {vacante.estado === "abierta" ? "Cerrar vacante" : "Reabrir vacante"}
+            </button>
+            <button
+              type="button"
+              onClick={() => onEditar(vacante)}
+              className="ml-2 text-[11px] font-medium text-[#F5B800]/80 hover:text-[#F5B800]"
+            >
+              Editar
+            </button>
+            <button
+              type="button"
+              onClick={() => onEliminar(vacante.id)}
+              className="ml-2 text-[11px] font-medium text-[#F5B800]/80 hover:text-[#F5B800]"
+            >
+              Eliminar
+            </button>
+          </>
         )}
+
       </div>
 
       <h3 className="text-sm font-semibold md:text-base" style={{ color: ORO }}>
@@ -139,7 +162,7 @@ function TarjetaVacante({
 
 export function VacantesBoard() {
   const { usuario } = useAuth();
-  const { vacantes: vacantesStore, actualizarEstadoVacante } = useAtsStore();
+  const { vacantes: vacantesStore, actualizarEstadoVacante, actualizarVacante, eliminarVacante } = useAtsStore();
 
   // Renderizado instantáneo (0ms): se inicia directamente con las vacantes en memoria / localStorage
   const [vacantes, setVacantes] = useState<Vacante[]>(() =>
@@ -152,6 +175,9 @@ export function VacantesBoard() {
 
   const [modalCrearAbierto, setModalCrearAbierto] = useState(false);
   const [vacanteParaPostularse, setVacanteParaPostularse] = useState<Vacante | null>(null);
+  const [vacanteParaEditar, setVacanteParaEditar] = useState<Vacante | null>(null);
+  const [confirmarEliminarOpen, setConfirmarEliminarOpen] = useState(false);
+  const [vacanteIdAEliminar, setVacanteIdAEliminar] = useState<string | null>(null);
 
   const esRh = usuario?.rol === "rh";
 
@@ -235,6 +261,27 @@ export function VacantesBoard() {
     setVacantes((prev) =>
       prev.map((v) => (v.id === vacante.id ? { ...v, estado: nuevo } : v)),
     );
+  };
+
+  // Open edit modal
+  const abrirEditar = (v: Vacante) => setVacanteParaEditar(v);
+  const cerrarEditar = () => setVacanteParaEditar(null);
+
+  // Open delete confirmation
+  const abrirEliminar = (id: string) => {
+    setVacanteIdAEliminar(id);
+    setConfirmarEliminarOpen(true);
+  };
+  const cerrarEliminar = () => {
+    setConfirmarEliminarOpen(false);
+    setVacanteIdAEliminar(null);
+  };
+  const confirmarEliminar = async () => {
+    if (vacanteIdAEliminar) {
+      await eliminarVacante(vacanteIdAEliminar);
+      setVacantes((prev) => prev.filter((v) => v.id !== vacanteIdAEliminar));
+    }
+    cerrarEliminar();
   };
 
   const porEstado = useMemo(() => {
@@ -331,6 +378,8 @@ export function VacantesBoard() {
                       esRh={esRh}
                       onPostularse={(v) => setVacanteParaPostularse(v)}
                       onAlternarEstado={alternarEstadoVacante}
+                      onEditar={abrirEditar}
+                      onEliminar={abrirEliminar}
                     />
                   ))
                 )}
@@ -344,6 +393,20 @@ export function VacantesBoard() {
       <ModalCrearVacante
         open={modalCrearAbierto}
         onClose={() => setModalCrearAbierto(false)}
+      />
+
+      {/* Modal para editar una vacante */}
+      <ModalEditarVacante
+        open={Boolean(vacanteParaEditar)}
+        vacante={vacanteParaEditar}
+        onClose={cerrarEditar}
+      />
+
+      {/* Modal de confirmación para eliminar */}
+      <ModalConfirmacionEliminar
+        open={confirmarEliminarOpen}
+        onClose={cerrarEliminar}
+        onConfirm={confirmarEliminar}
       />
 
       {/* Modal para que el candidato se postule */}

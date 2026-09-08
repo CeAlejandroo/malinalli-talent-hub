@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
-import type { Vacante, EstadoVacante } from "@/types/database";
-import {
-  candidatosIniciales,
-  type Candidato,
-  type Etapa,
-} from "@/data/malinalli";
+import type { Vacante, EstadoVacante, Candidato, Etapa } from "@/types/database";
 
 const STORAGE_VACANTES = "malinalli.vacantes";
 const STORAGE_CANDIDATOS = "malinalli.candidatos";
@@ -142,18 +137,6 @@ function guardarVacantes(vacantes: Vacante[]) {
   }
 }
 
-function obtenerCandidatosGuardados(): Candidato[] {
-  if (typeof window === "undefined") return candidatosIniciales;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_CANDIDATOS);
-    if (!raw) return candidatosIniciales;
-    const parsed = JSON.parse(raw) as Candidato[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : candidatosIniciales;
-  } catch {
-    return candidatosIniciales;
-  }
-}
-
 function guardarCandidatos(candidatos: Candidato[]) {
   if (typeof window === "undefined") return;
   try {
@@ -188,34 +171,50 @@ function guardarPostulaciones(items: PostulacionItem[]) {
 
 export function useAtsStore() {
   const [vacantes, setVacantes] = useState<Vacante[]>(obtenerVacantesGuardadas);
-  const [candidatos, setCandidatos] = useState<Candidato[]>(obtenerCandidatosGuardados);
+  const [candidatos, setCandidatos] = useState<Candidato[]>([]);
   const [postulaciones, setPostulaciones] = useState<PostulacionItem[]>(
     obtenerPostulacionesGuardadas,
   );
 
+  const cargarCandidatos = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setCandidatos([]);
+      return;
+    }
+    try {
+      const { data, error } = await supabase.from("postulantes").select("*");
+      if (error) {
+        console.warn("Supabase candidate fetch error:", error.message);
+        setCandidatos([]);
+      } else {
+        setCandidatos(data as Candidato[]);
+      }
+    } catch (err) {
+      console.warn("Network error fetching candidatos:", err);
+      setCandidatos([]);
+    }
+  }, []);
+
   const sincronizar = useCallback(() => {
     setVacantes(obtenerVacantesGuardadas());
-    setCandidatos(obtenerCandidatosGuardados());
+    void cargarCandidatos();
     setPostulaciones(obtenerPostulacionesGuardadas());
-  }, []);
+  }, [cargarCandidatos]);
 
   useEffect(() => {
     window.addEventListener("malinalli:vacantes_updated", sincronizar);
-    window.addEventListener("malinalli:candidatos_updated", sincronizar);
     window.addEventListener("malinalli:postulaciones_updated", sincronizar);
     window.addEventListener("storage", sincronizar);
 
+    void cargarCandidatos();
+
     return () => {
       window.removeEventListener("malinalli:vacantes_updated", sincronizar);
-      window.removeEventListener("malinalli:candidatos_updated", sincronizar);
       window.removeEventListener("malinalli:postulaciones_updated", sincronizar);
       window.removeEventListener("storage", sincronizar);
     };
   }, [sincronizar]);
 
-  /**
-   * Crear y subir una nueva vacante (disponible para el usuario de RH).
-   */
   const crearVacante = useCallback(
     async (datos: {
       titulo: string;
@@ -236,7 +235,6 @@ export function useAtsStore() {
       guardarVacantes(actualizadas);
       setVacantes(actualizadas);
 
-      // Si Supabase está disponible, intentar insertar en la base de datos
       if (isSupabaseConfigured) {
         try {
           await supabase.from("vacantes").insert({
@@ -254,12 +252,57 @@ export function useAtsStore() {
 
       return nueva;
     },
-    [],
+    []
   );
 
-  /**
-   * Actualizar el estado de una vacante (abierta / cerrada).
-   */
+  // Update an existing vacancy
+  const actualizarVacante = useCallback(
+    async (vacanteActualizada: Vacante) => {
+      const listaActual = obtenerVacantesGuardadas();
+      const actualizadas = listaActual.map((v) =>
+        v.id === vacanteActualizada.id ? vacanteActualizada : v,
+      );
+      guardarVacantes(actualizadas);
+      setVacantes(actualizadas);
+
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from("vacantes")
+            .update({
+              titulo: vacanteActualizada.titulo,
+              departamento: vacanteActualizada.departamento,
+              ubicacion: vacanteActualizada.ubicacion,
+              tipo_jornada: vacanteActualizada.tipo_jornada,
+              descripcion: vacanteActualizada.descripcion,
+              estado: vacanteActualizada.estado,
+            })
+            .eq("id", vacanteActualizada.id);
+        } catch (error) {
+          console.warn("Error al actualizar vacante en Supabase:", error);
+        }
+      }
+    },
+    []
+  );
+
+  // Delete a vacancy
+  const eliminarVacante = useCallback(async (id: string) => {
+    const listaActual = obtenerVacantesGuardadas();
+    const filtradas = listaActual.filter((v) => v.id !== id);
+    guardarVacantes(filtradas);
+    setVacantes(filtradas);
+
+    if (isSupabaseConfigured) {
+      try {
+        await supabase.from("vacantes").delete().eq("id", id);
+      } catch (error) {
+        console.warn("Error al eliminar vacante en Supabase:", error);
+      }
+    }
+  }, []);
+
+
+
   const actualizarEstadoVacante = useCallback(
     async (id: string, nuevoEstado: EstadoVacante) => {
       const listaActual = obtenerVacantesGuardadas();
@@ -280,43 +323,33 @@ export function useAtsStore() {
     [],
   );
 
-  /**
-   * Actualizar la etapa/estado de un postulante (Postulado, Filtro, Entrevista, Oferta, Contratado).
-   */
   const actualizarEtapaCandidato = useCallback(
-    (candidatoId: string, nuevaEtapa: Etapa) => {
-      const lista = obtenerCandidatosGuardados();
-      const actualizados = lista.map((c) =>
-        c.id === candidatoId ? { ...c, etapa: nuevaEtapa } : c,
+    async (candidatoId: string, nuevaEtapa: Etapa) => {
+      setCandidatos((prev) =>
+        prev.map((c) => (c.id === candidatoId ? { ...c, etapa: nuevaEtapa } : c)),
       );
-      guardarCandidatos(actualizados);
-      setCandidatos(actualizados);
-
-      // Si hay postulaciones del usuario que coinciden, actualizar también su estatus
-      const posts = obtenerPostulacionesGuardadas();
-      const candidato = lista.find((c) => c.id === candidatoId);
-      if (candidato) {
-        const postsActualizadas = posts.map((p) =>
-          p.vacanteTitulo === candidato.vacante || p.nombreCandidato === candidato.nombre
+      if (isSupabaseConfigured) {
+        try {
+          await supabase.from("postulantes").update({ estado: nuevaEtapa }).eq("id", candidatoId);
+        } catch (error) {
+          console.warn("Error updating candidato etapa in Supabase:", error);
+        }
+      }
+      setPostulaciones((prev) =>
+        prev.map((p) =>
+          p.vacanteId === candidatoId || p.nombreCandidato === candidatoId
             ? { ...p, estatus: nuevaEtapa }
             : p,
-        );
-        guardarPostulaciones(postsActualizadas);
-        setPostulaciones(postsActualizadas);
-      }
+        ),
+      );
     },
-    [],
+    []
   );
 
-  /**
-   * Postularse a una vacante (disponible para el usuario Candidato).
-   */
   const postularseAVacante = useCallback(
     async (datos: {
       vacanteId: string;
       vacanteTitulo: string;
-      departamento?: string;
-      ubicacion?: string;
       nombre: string;
       email: string;
       telefono?: string;
@@ -329,7 +362,6 @@ export function useAtsStore() {
         .map((p) => p[0]?.toUpperCase() ?? "")
         .join("") || "CA";
 
-      // 1. Crear nuevo candidato para el tablero y tabla de RH
       const nuevoCandidato: Candidato = {
         id: "cand-" + Date.now(),
         nombre: datos.nombre,
@@ -342,18 +374,15 @@ export function useAtsStore() {
         etiqueta: "Nuevo",
       };
 
-      const candidatosActuales = obtenerCandidatosGuardados();
-      const listaCandidatos = [nuevoCandidato, ...candidatosActuales];
-      guardarCandidatos(listaCandidatos);
-      setCandidatos(listaCandidatos);
+      setCandidatos((prev) => [nuevoCandidato, ...prev]);
+      guardarCandidatos([nuevoCandidato, ...candidatos]);
 
-      // 2. Guardar en el historial de postulaciones del candidato
       const nuevaPostulacion: PostulacionItem = {
         id: "post-" + Date.now(),
         vacanteId: datos.vacanteId,
         vacanteTitulo: datos.vacanteTitulo,
         empresa: "Malinalli Elite",
-        ubicacion: datos.ubicacion ?? "México",
+        ubicacion: "México",
         fecha: "Hoy",
         estatus: "Postulado",
         nombreCandidato: datos.nombre,
@@ -362,13 +391,9 @@ export function useAtsStore() {
         linkedin: datos.linkedin,
         notas: datos.notas,
       };
+      setPostulaciones((prev) => [nuevaPostulacion, ...prev]);
+      guardarPostulaciones([nuevaPostulacion, ...postulaciones]);
 
-      const postsActuales = obtenerPostulacionesGuardadas();
-      const listaPosts = [nuevaPostulacion, ...postsActuales];
-      guardarPostulaciones(listaPosts);
-      setPostulaciones(listaPosts);
-
-      // 3. Si Supabase está disponible, intentar insertar en postulantes
       if (isSupabaseConfigured) {
         try {
           await supabase.from("postulantes").insert({
@@ -380,13 +405,12 @@ export function useAtsStore() {
             estado: "nuevo",
           });
         } catch (error) {
-          console.warn("Error al registrar postulación en Supabase (guardada localmente):", error);
+          console.warn("Error inserting postulante in Supabase:", error);
         }
       }
-
       return nuevoCandidato;
     },
-    [],
+    [candidatos, postulaciones]
   );
 
   return {
@@ -397,5 +421,7 @@ export function useAtsStore() {
     actualizarEstadoVacante,
     actualizarEtapaCandidato,
     postularseAVacante,
+    actualizarVacante,
+    eliminarVacante,
   };
 }

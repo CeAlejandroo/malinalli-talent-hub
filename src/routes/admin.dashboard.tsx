@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Plus, Star, Clock, GripVertical } from "lucide-react";
 import {
   etapas,
-  metricas,
   type Etapa,
 } from "@/data/malinalli";
 import { ModalCrearVacante } from "@/components/ModalCrearVacante";
@@ -69,15 +68,40 @@ function PanelRh() {
       />
 
       <section className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {metricas.map((m) => (
-          <div key={m.label} className="panel p-4">
-            <p className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
-              {m.label}
-            </p>
-            <p className="mt-2 font-display text-3xl font-bold text-primary">{m.valor}</p>
-            <p className="mt-1 text-xs text-muted-foreground">{m.detalle}</p>
-          </div>
-        ))}
+        {(() => {
+          const { vacantes, candidatos } = useAtsStore();
+          const metricas = [
+            {
+              label: "Candidatos nuevos",
+              valor: candidatos.filter(c => c.etapa === "Postulado").length.toString(),
+              detalle: "",
+            },
+            {
+              label: "Vacantes activas",
+              valor: vacantes.filter(v => v.estado === "abierta").length.toString(),
+              detalle: "",
+            },
+            {
+              label: "Entrevistas hoy",
+              valor: candidatos.filter(c => c.etapa === "Entrevista").length.toString(),
+              detalle: "",
+            },
+            {
+              label: "Tiempo contratación",
+              valor: "-",
+              detalle: "",
+            },
+          ];
+          return metricas.map((m) => (
+            <div key={m.label} className="panel p-4">
+              <p className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
+                {m.label}
+              </p>
+              <p className="mt-2 font-display text-3xl font-bold text-primary">{m.valor}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{m.detalle}</p>
+            </div>
+          ));
+        })()}
       </section>
 
       <h2 className="mb-3 text-lg font-semibold">Pipeline principal</h2>
@@ -173,9 +197,9 @@ function PanelRh() {
                 ))}
 
                 {items.length === 0 && (
-                  <p className="rounded-lg border border-dashed border-border py-6 text-center text-xs text-muted-foreground">
-                    Arrastra candidatos aquí
-                  </p>
+                    <p className="rounded-lg border border-dashed border-[#F5B800]/30 bg-[#1C0D0A] p-4 text-center text-xs text-[#F5B800]/70 backdrop-blur-sm">
+                      Sin candidatos postulados
+                    </p>
                 )}
               </div>
             </section>
