@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MensajesRouteImport } from './routes/mensajes'
 import { Route as MisPostulacionesRouteImport } from './routes/mis-postulaciones'
 import { Route as VacantesRouteImport } from './routes/vacantes'
 import { Route as AdminCandidatosRouteImport } from './routes/admin.candidatos'
@@ -32,6 +33,11 @@ const AdminRoute = AdminRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MensajesRoute = MensajesRouteImport.update({
+  id: '/mensajes',
+  path: '/mensajes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MisPostulacionesRoute = MisPostulacionesRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/mensajes': typeof MensajesRoute
   '/mis-postulaciones': typeof MisPostulacionesRoute
   '/vacantes': typeof VacantesRoute
   '/admin/candidatos': typeof AdminCandidatosRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/mensajes': typeof MensajesRoute
   '/mis-postulaciones': typeof MisPostulacionesRoute
   '/vacantes': typeof VacantesRoute
   '/admin/candidatos': typeof AdminCandidatosRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/login': typeof LoginRoute
+  '/mensajes': typeof MensajesRoute
   '/mis-postulaciones': typeof MisPostulacionesRoute
   '/vacantes': typeof VacantesRoute
   '/admin/candidatos': typeof AdminCandidatosRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
+    | '/mensajes'
     | '/mis-postulaciones'
     | '/vacantes'
     | '/admin/candidatos'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
+    | '/mensajes'
     | '/mis-postulaciones'
     | '/vacantes'
     | '/admin/candidatos'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/login'
+    | '/mensajes'
     | '/mis-postulaciones'
     | '/vacantes'
     | '/admin/candidatos'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MensajesRoute: typeof MensajesRoute
   MisPostulacionesRoute: typeof MisPostulacionesRoute
   VacantesRoute: typeof VacantesRoute
 }
@@ -164,6 +177,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mensajes': {
+      id: '/mensajes'
+      path: '/mensajes'
+      fullPath: '/mensajes'
+      preLoaderRoute: typeof MensajesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mis-postulaciones': {
@@ -231,6 +251,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   LoginRoute: LoginRoute,
+  MensajesRoute: MensajesRoute,
   MisPostulacionesRoute: MisPostulacionesRoute,
   VacantesRoute: VacantesRoute,
 }

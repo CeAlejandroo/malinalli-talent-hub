@@ -37,7 +37,7 @@ const etiquetaClases: Record<string, string> = {
 };
 
 function PanelRh() {
-  const { candidatos, actualizarEtapaCandidato } = useAtsStore();
+  const { vacantes, candidatos, actualizarEtapaCandidato } = useAtsStore();
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const [sobre, setSobre] = useState<Etapa | null>(null);
   const [modalVacanteAbierto, setModalVacanteAbierto] = useState(false);
@@ -69,27 +69,38 @@ function PanelRh() {
 
       <section className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {(() => {
-          const { vacantes, candidatos } = useAtsStore();
+          const totalCandidatos = candidatos.length;
+          const nuevos = candidatos.filter((c) => c.etapa === "Postulado").length;
+          const activas = vacantes.filter((v) => v.estado === "abierta").length;
+          const enProceso = candidatos.filter(
+            (c) => c.etapa === "Entrevista" || c.etapa === "Filtro",
+          ).length;
+          const contratados = candidatos.filter((c) => c.etapa === "Contratado").length;
+          const tasaContratacion =
+            totalCandidatos > 0
+              ? `${((contratados / totalCandidatos) * 100).toFixed(0)}%`
+              : "0%";
+
           const metricas = [
             {
-              label: "Candidatos nuevos",
-              valor: candidatos.filter(c => c.etapa === "Postulado").length.toString(),
-              detalle: "",
+              label: "Candidatos en pipeline",
+              valor: totalCandidatos.toString(),
+              detalle: `${nuevos} en etapa inicial (Postulado)`,
             },
             {
               label: "Vacantes activas",
-              valor: vacantes.filter(v => v.estado === "abierta").length.toString(),
-              detalle: "",
+              valor: activas.toString(),
+              detalle: `${vacantes.length} vacantes registradas en total`,
             },
             {
-              label: "Entrevistas hoy",
-              valor: candidatos.filter(c => c.etapa === "Entrevista").length.toString(),
-              detalle: "",
+              label: "En evaluación / entrevista",
+              valor: enProceso.toString(),
+              detalle: `${candidatos.filter((c) => c.etapa === "Entrevista").length} con entrevista activa`,
             },
             {
-              label: "Tiempo contratación",
-              valor: "-",
-              detalle: "",
+              label: "Tasa de contratación",
+              valor: tasaContratacion,
+              detalle: `${contratados} candidatos seleccionados`,
             },
           ];
           return metricas.map((m) => (

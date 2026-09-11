@@ -141,6 +141,13 @@ function Candidatos() {
                 </td>
               </tr>
             ))}
+            {filtrados.length === 0 && (
+              <tr>
+                <td colSpan={5} className="py-8 text-center text-sm text-muted-foreground">
+                  No se encontraron candidatos que coincidan con la búsqueda o filtro.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

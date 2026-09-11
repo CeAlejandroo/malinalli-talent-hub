@@ -14,6 +14,7 @@ const enlacesRh = [
 const enlacesCandidato = [
   { to: "/vacantes", label: "Vacantes" },
   { to: "/mis-postulaciones", label: "Mis postulaciones" },
+  { to: "/mensajes", label: "Mensajes" },
 ] as const;
 
 export function TopNav() {
@@ -75,11 +76,10 @@ export function TopNav() {
             <div className="ml-3 flex items-center gap-2 border-l border-border/80 pl-3">
               {/* Badge del usuario activo basado estrictamente en el rol de la base de datos */}
               <div
-                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${
-                  esRh
+                className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${esRh
                     ? "border border-primary/50 bg-primary/10 text-primary"
                     : "border border-[#F5B800]/50 bg-[#F5B800]/10 text-[#F5B800]"
-                }`}
+                  }`}
               >
                 <UserCheck className="h-3 w-3" />
                 <span className="max-w-[120px] truncate">{usuario.nombre}</span>

@@ -5,20 +5,20 @@ import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 export type Rol = "candidato" | "rh";
 
 export type Usuario = {
-  id?: string;
+  id?: string | undefined;
   nombre: string;
   email: string;
   rol: Rol;
-  telefono?: string;
+  telefono?: string | undefined;
 };
 
 export interface CuentaUsuario {
   id: string;
   nombre: string;
   email: string;
-  password?: string;
+  password?: string | undefined;
   rol: Rol;
-  telefono?: string;
+  telefono?: string | undefined;
   created_at: string;
 }
 
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (isSupabaseConfigured) {
         try {
-          const { data: dbUser } = await supabase
+          const { data: dbUser } = await (supabase as any)
             .from("usuarios")
             .select("id, nombre, email, rol, telefono")
             .eq("email", emailLimpio)
@@ -184,7 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const nuevoUsuario: Usuario = {
         email: emailLimpio,
-        nombre: nombreDetectado || emailLimpio.split("@")[0],
+        nombre: nombreDetectado || (emailLimpio.split("@")[0] ?? "Usuario"),
         rol: rolDetectado,
       };
 
@@ -229,7 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: emailLimpio,
         password: password?.trim() || "password123",
         rol: "candidato", // El rol es siempre 'candidato' para cuentas nuevas
-        telefono: telefono?.trim(),
+        telefono: telefono?.trim() || undefined,
         created_at: new Date().toISOString(),
       };
 
@@ -239,7 +239,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Sincronizar con Supabase si está disponible
       if (isSupabaseConfigured) {
         try {
-          await supabase.from("usuarios").insert({
+          await (supabase as any).from("usuarios").insert({
             nombre: nuevaCuenta.nombre,
             email: nuevaCuenta.email,
             rol: "candidato",
@@ -255,7 +255,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         nombre: nuevaCuenta.nombre,
         email: nuevaCuenta.email,
         rol: "candidato",
-        telefono: nuevaCuenta.telefono,
+        telefono: nuevaCuenta.telefono || undefined,
       };
 
       setUsuario(sesion);
@@ -280,7 +280,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const encontrada = cuentas.find((c) => c.email.toLowerCase() === emailLimpio);
 
       const rolAsignado: Rol = rol || (encontrada ? encontrada.rol : (emailLimpio.includes("rh") ? "rh" : "candidato"));
-      const nombreAsignado = nombre || (encontrada ? encontrada.nombre : emailLimpio.split("@")[0]);
+      const nombreAsignado = nombre || (encontrada ? encontrada.nombre : (emailLimpio.split("@")[0] ?? "Usuario"));
 
       const nuevo: Usuario = {
         nombre: nombreAsignado,
